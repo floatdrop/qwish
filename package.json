@@ -1,9 +1,9 @@
 {
-  "name": "sqwish",
+  "name": "qwish",
   "description": "a tool for compressing CSS",
-  "homepage": "https://github.com/ded/sqwish",
-  "version": "0.2.2",
-  "author": "Dustin Diaz <@ded>",
+  "homepage": "https://github.com/floatdrop/qwish",
+  "version": "0.0.1",
+  "author": "Vsevolod Strukchinsky <@floatdrop>",
   "keywords": [
     "minify",
     "css",
@@ -11,7 +11,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/ded/sqwish.git"
+    "url": "git://github.com/floatdrop/qwish.git"
   },
   "main": "src/index.js",
   "engines": {
@@ -22,13 +22,14 @@
     "bin": "bin"
   },
   "devDependencies": {
-    "sink-test": ">= 0.0.6"
+    "mocha": "^2.1.0",
+    "should": "^4.4.1"
   },
   "scripts": {
-    "test": "node tests/tests.js"
+    "test": "mocha -R spec tests/*.js"
   },
   "preferGlobal": true,
   "bin": {
-    "sqwish": "bin/sqwish"
+    "qwish": "bin/qwish"
   }
 }

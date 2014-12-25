@@ -1,92 +1,74 @@
-var sink = require('../node_modules/sink-test/')
-  , start = sink.start
-  , sink = sink.sink
-  , sqwish = require('../src')
+/* global describe, it */
 
-sink('basic mode', function (test, ok) {
+var qwish = require('../src');
+require('should');
 
-  test('whitespace', 1, function () {
-    var input = '  \n  body  {  color  :  red ; background  :  blue  ; \r\n  }  '
-      , expected = 'body{color:red;background:blue}'
-      , actual = sqwish.minify(input)
-    ok(actual == expected, 'all appropriate whitespace was removed')
-  })
+describe('basic mode', function () {
+    it('should remove whitespaces', function () {
+        var input = '  \n  body  {  color  :  red ; background  :  blue  ; \r\n  }  ',
+            expected = 'body{color:red;background:blue}',
+            actual = qwish.minify(input);
 
-  test('long hex to short hex', 1, function () {
-    var input = 'p { color: #ffcc33; }'
-      , expected = 'p{color:#fc3}'
-      , actual = sqwish.minify(input)
-    ok(actual == expected, 'collapsed #ffcc33 to #fc3')
-  })
+        actual.should.be.eql(expected);
+    });
 
-  test('IE long hex is kept as long hex', 1, function () {
-    var input = "body { filter: progid:DXImageTransform.Microsoft.gradient(gradientType=0, startColorstr='#FFF2F2F2', endColorstr='#FFFFFFFF'); }"
-      , expected = "body{filter:progid:DXImageTransform.Microsoft.gradient(gradientType=0,startColorstr='#FFF2F2F2',endColorstr='#FFFFFFFF')}"
-      , actual = sqwish.minify(input)
-    ok(actual == expected, 'IE long hexes are kept that way')
-  })
+    it('should convert long hex to short hex', function () {
+        var input = 'p { color: #ffcc33; }',
+            expected = 'p{color:#fc3}',
+            actual = qwish.minify(input);
 
-  test('IE 6-digit hex is kept as 6-digit hex', 1, function () {
-    var input = "body { filter: progid:DXImageTransform.Microsoft.gradient(gradientType=0, startColorstr='#F2F2F2', endColorstr='#FFFFFF'); }"
-      , expected = "body{filter:progid:DXImageTransform.Microsoft.gradient(gradientType=0,startColorstr='#F2F2F2',endColorstr='#FFFFFF')}"
-      , actual = sqwish.minify(input)
-    ok(actual == expected, 'IE 6-digit hexes are kept that way')
-  })
+        actual.should.be.eql(expected);
+    });
 
-  test('longhand values to shorthand values', 1, function () {
-    var input = 'p { margin: 0px 1px 0px 1px }'
-      , expected = 'p{margin:0 1px}'
-      , actual = sqwish.minify(input)
-    ok(actual == expected, 'collapsed 0px 1px 0px 1px to 0 1px')
-  })
+    it('should keep IE long hex as long hex', function () {
+        var input = 'body { filter: progid:DXImageTransform.Microsoft.gradient(gradientType=0, startColorstr="#FFF2F2F2", endColorstr="#FFFFFFFF"); }',
+            expected = 'body{filter:progid:DXImageTransform.Microsoft.gradient(gradientType=0,startColorstr="#FFF2F2F2",endColorstr="#FFFFFFFF")}',
+            actual = qwish.minify(input);
 
-  test('certain longhand values are maintained', 1, function () {
-    var input = 'p { margin: 11px 1px 1px 1px }'
-      , expected = 'p{margin:11px 1px 1px 1px}'
-      , actual = sqwish.minify(input)
-    ok(actual == expected, 'maintained 11px 1px 1px 1px')
-  })
+        actual.should.be.eql(expected);
+    });
 
-  test('certain double-specified longhand values are maintained', 1, function () {
-    var input = 'p { margin: 12px 12px 2px 12px }'
-      , expected = 'p{margin:12px 12px 2px 12px}'
-      , actual = sqwish.minify(input)
-    ok(actual == expected, 'maintained 12px 12px 2px 12px')
-  })
+    it('should keep IE 6-digit hex as 6-digit hex', function () {
+        var input = 'body { filter: progid:DXImageTransform.Microsoft.gradient(gradientType=0, startColorstr="#F2F2F2", endColorstr="#FFFFFF"); }',
+            expected = 'body{filter:progid:DXImageTransform.Microsoft.gradient(gradientType=0,startColorstr="#F2F2F2",endColorstr="#FFFFFF")}',
+            actual = qwish.minify(input);
 
-  test('does not break with @media queries', 2, function () {
-    var input = '@media screen and (max-device-width: 480px) {' +
-                '  .column {' +
-                '    float: none;' +
-                '  }' +
-                '}'
-      , expected = '@media screen and (max-device-width:480px){.column{float:none}}'
-      , strictOutput = sqwish.minify(input, true)
-      , regularOutput = sqwish.minify(input)
-    console.log(strictOutput)
-    console.log(regularOutput)
-    ok(regularOutput == expected, 'media queries do not blow up')
-    ok(strictOutput == expected, 'media queries do not blow up in strict mode')
+        actual.should.be.eql(expected);
+    });
 
-  })
+    it('should collaps longhand values to shorthand values', function () {
+        var input = 'p { margin: 0px 1px 0px 1px }',
+            expected = 'p{margin:0 1px}',
+            actual = qwish.minify(input);
 
-})
+        actual.should.be.eql(expected);
+    });
 
-sink('strict mode', function (test, ok) {
-  test('combined rules', 1, function () {
-    var input = 'div { color: red; } div { background: orange; }'
-      , expected = 'div{background:orange;color:red}'
-      , actual = sqwish.minify(input, true)
-    ok(actual == expected, 'collapsed div into a single rule')
-  })
+    it('should maintain certain longhand values', function () {
+        var input = 'p { margin: 11px 1px 1px 1px }',
+            expected = 'p{margin:11px 1px 1px 1px}',
+            actual = qwish.minify(input);
 
-  test('combine duplicate properties', 1, function () {
-    var input = 'div { color: red; } div { color: #ffcc88; }'
-      , expected = 'div{color:#fc8}'
-      , actual = sqwish.minify(input, true)
-    ok(actual == expected, 'collapsed duplicate into a single declaration')
-  })
+        actual.should.be.eql(expected);
+    });
 
-})
+    it('should maintain certain double-specified longhand values', function () {
+        var input = 'p { margin: 12px 12px 2px 12px }',
+            expected = 'p{margin:12px 12px 2px 12px}',
+            actual = qwish.minify(input);
 
-start()
+        actual.should.be.eql(expected);
+    });
+
+    it('should not break with @media queries', function () {
+        var input = '@media screen and (max-device-width: 480px) {' +
+                  '  .column {' +
+                  '    float: none;' +
+                  '  }' +
+                  '}',
+            expected = '@media screen and (max-device-width:480px){.column{float:none}}',
+            actual = qwish.minify(input);
+
+        actual.should.be.eql(expected);
+    });
+});
