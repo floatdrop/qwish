@@ -1,5 +1,7 @@
 /* global describe, it */
 
+'use strict';
+
 var qwish = require('../src');
 require('should');
 
@@ -67,6 +69,14 @@ describe('basic mode', function () {
                   '  }' +
                   '}',
             expected = '@media screen and (max-device-width:480px){.column{float:none}}',
+            actual = qwish.minify(input);
+
+        actual.should.be.eql(expected);
+    });
+
+    it('should not break unqualified psuedo-classes', function () {
+        var input = 'body :first-child {}',
+            expected = 'body :first-child{}',
             actual = qwish.minify(input);
 
         actual.should.be.eql(expected);

@@ -20,8 +20,11 @@ function qwish(css) {
         // line breaks and carriage returns
         .replace(/[\n\r]/g, '')
 
-        // space between selectors, declarations, properties and values
-        .replace(/\s*([:;,{}])\s*/g, '$1')
+        // space between declarations and properties
+        .replace(/\s*([;,{}])\s*/g, '$1')
+
+        // space between values
+        .replace(/\s*([:])\s+/g, '$1')
 
         // replace multiple spaces with single spaces
         .replace(/\s+/g, ' ')
