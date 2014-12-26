@@ -2,7 +2,7 @@
   "name": "qwish",
   "description": "a tool for compressing CSS",
   "homepage": "https://github.com/floatdrop/qwish",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Vsevolod Strukchinsky <@floatdrop>",
   "keywords": [
     "minify",
